@@ -1,6 +1,6 @@
-# discord-ripbot
+# raidbot3000
 
-The Fabulous Ripbot Reborn for Discord
+The Fabulous Raidbot 3000
 
 ## How to develop
 

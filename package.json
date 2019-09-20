@@ -1,11 +1,11 @@
 {
-  "name": "discord-ripbot",
+  "name": "raidbot3000",
   "version": "0.0.1",
   "license": "MIT",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.org/mikhepls/discord-ripbot"
+    "url": "https://github.org/roostermagic/raidbot3000"
   },
   "engines": {
     "node": ">=8.9.4",
@@ -25,7 +25,6 @@
     "discord.js": "11.3.0",
     "dotenv": "5.0.1",
     "knex": "0.14.4",
-    "mersenne-twister": "1.1.0",
     "nodemon": "1.17.1",
     "pg": "7.4.1",
     "voca": "1.4.0"
