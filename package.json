@@ -25,6 +25,7 @@
     "discord.js": "11.3.0",
     "dotenv": "5.0.1",
     "knex": "0.14.4",
+    "lodash.debounce": "4.0.8",
     "nodemon": "1.17.1",
     "pg": "7.4.1",
     "voca": "1.4.0"

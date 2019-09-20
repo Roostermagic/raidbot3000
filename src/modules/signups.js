@@ -79,13 +79,16 @@ const addSignup = (messageReaction, user) => {
   }
 };
 
-const removeUserFromEmbedField = (message, embeddedMessage, userName) => {
-  embeddedMessage.fields.forEach(field => {
-    const users = field.value.split(',').map(name => name.trim());
-    const usersRemoved = users.filter(user => user !== userName);
-    if (usersRemoved.length === 0 || usersRemoved === placeholderSignup) field.value = placeholderSignup;
-    else field.value = usersRemoved.join(', ');
-  });
+const removeUserFromEmbedField = (message, embeddedMessage, fieldName, userName) => {
+  const index = embeddedMessage.fields.findIndex(element => element.name === fieldName);
+  let field = Object.assign({}, embeddedMessage.fields[index]);
+
+  const users = field.value.split(',').map(name => name.trim());
+  const usersRemoved = users.filter(user => user !== userName);
+  if (usersRemoved.length === 0 || usersRemoved === placeholderSignup) field.value = placeholderSignup;
+  else field.value = usersRemoved.join(', ');
+
+  embeddedMessage.fields[index] = field;
 
   embeddedMessage.fields.forEach(field => {
     field.embed = null;
@@ -105,7 +108,20 @@ const removeSignup = (messageReaction, user) => {
   const embeddedMessage = message.embeds[0];
   if (!embeddedMessage || embeddedMessage.type !== 'rich') return;
 
-  removeUserFromEmbedField(message, embeddedMessage, user.username);
+  const emojis = guildEmojis(message);
+  const reactionEmoji = messageReaction.emoji.name;
+
+  switch (reactionEmoji) {
+    case 'tank':
+      removeUserFromEmbedField(message, embeddedMessage, `${tankEmoji(emojis)}`, user.username);
+      break;
+    case 'healer':
+      removeUserFromEmbedField(message, embeddedMessage, `${healerEmoji(emojis)}`, user.username);
+      break;
+    case 'dps':
+      removeUserFromEmbedField(message, embeddedMessage, `${dpsEmoji(emojis)}`, user.username);
+      break;
+  }
 };
 
 module.exports = { createSignup, addSignup, removeSignup };

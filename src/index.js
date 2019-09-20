@@ -1,7 +1,10 @@
 require('dotenv').config();
+
 const Discord = require('discord.js');
+const debounce = require('lodash.debounce');
 
 const knex = require('./knex');
+const signups = require('./modules/signups');
 const utils = require('./modules/utils');
 
 const client = new Discord.Client();
@@ -24,6 +27,16 @@ client.on('message', async message => {
   if (!message.author.bot) {
     utils.handleMessage(message);
   }
+});
+
+client.on('messageReactionAdd', async (messageReaction, user) => {
+  if (messageReaction.message.author.id !== client.user.id) return;
+  debounce(signups.addSignup(messageReaction, user), 150);
+});
+
+client.on('messageReactionRemove', async (messageReaction, user) => {
+  if (messageReaction.message.author.id !== client.user.id) return;
+  debounce(signups.removeSignup(messageReaction, user), 150);
 });
 
 const login = async () => {
