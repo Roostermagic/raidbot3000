@@ -10,6 +10,12 @@ const token = process.env.DISCORD_TOKEN;
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+const start = async () => {
+  await utils.migrateLatest(knex);
+};
+
+start();
+
 client.on('ready', () => {
   console.log('I am ready!');
 });
