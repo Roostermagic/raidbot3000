@@ -7,7 +7,6 @@ COPY yarn.lock .
 
 RUN yarn install --production --pure-lockfile
 
-COPY data ./data
 COPY src ./src
 COPY .env .
 

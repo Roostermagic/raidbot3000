@@ -1,7 +1,5 @@
 const path = require('path');
 
-const voca = require('voca');
-
 const help = require('./help');
 const signups = require('./signups');
 
@@ -15,14 +13,10 @@ const isInArray = (array, string) => {
   return array.indexOf(string.toLowerCase()) > -1;
 };
 
-// Filthy hack to fix rolling
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-
 const handleMessage = async message => {
   // Words with separators, for commands
   const messageContent = message.content.toLowerCase().split(' ');
-  // Words without separators, for triggers
-  const messageWords = voca.words(message.content.toLowerCase());
+
   switch (messageContent[0]) {
     case '!raid':
       signups.createSignup(message);
@@ -35,4 +29,4 @@ const handleMessage = async message => {
   }
 };
 
-module.exports = { migrateLatest, runSeeds, isInArray, computerComments, handleMessage };
+module.exports = { migrateLatest, isInArray, handleMessage };
