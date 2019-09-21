@@ -1,5 +1,9 @@
 const { RichEmbed } = require('discord.js');
 const voca = require('voca');
+const moment = require('moment');
+
+const knex = require('../knex');
+const utils = require('../util/utils');
 
 const guildEmojis = message => message.guild.emojis;
 const tankEmoji = emojis => emojis.find('name', 'tank');
@@ -27,14 +31,41 @@ const createEmbed = (message, title, description) => {
 // '!raid '
 const parseDescription = message => voca.slice(message.content, 6, message.content.length);
 
-const createSignup = message => {
+const createSignup = async message => {
+  const desc = parseDescription(message);
+
+  if (!validateMessage(message)) return;
+
+  const embed = createEmbed(message, title, desc);
+
+  const date = utils.getDate(desc);
+
+  await knex('raids').insert({ description: 'description', date: moment(date, 'DD.MM.YYYY').toDate() });
+
+  message.channel.send(embed).then(m => {
+    const emojis = guildEmojis(message);
+
+    m.react(tankEmoji(emojis));
+    m.react(healerEmoji(emojis));
+    m.react(dpsEmoji(emojis));
+  });
+};
+
+const validateMessage = message => {
+  const desc = parseDescription(message);
+  const date = utils.getDate(desc);
+
   if (!message.member.hasPermission('ADMINISTRATOR')) {
     message.channel.send("you don't have permission to do that dave");
-    return;
+    return false;
   }
 
-  const embed = createEmbed(message, title, parseDescription(message));
-  message.channel.send(embed);
+  if (!date || !moment(date, 'DD.MM.YYYY').isValid() || !moment(date, 'DD.MM.YYYY').isAfter()) {
+    message.channel.send('check the date pls >:(');
+    return false;
+  }
+
+  return true;
 };
 
 const addUserToEmbedField = (message, embeddedMessage, fieldName, userName) => {
@@ -59,7 +90,9 @@ const addUserToEmbedField = (message, embeddedMessage, fieldName, userName) => {
 };
 
 const addSignup = (messageReaction, user) => {
+  if (user.username === 'raidbot3000') return;
   const message = messageReaction.message;
+
   const embeddedMessage = message.embeds[0];
   if (!embeddedMessage || embeddedMessage.type !== 'rich') return;
 
@@ -79,13 +112,16 @@ const addSignup = (messageReaction, user) => {
   }
 };
 
-const removeUserFromEmbedField = (message, embeddedMessage, userName) => {
-  embeddedMessage.fields.forEach(field => {
-    const users = field.value.split(',').map(name => name.trim());
-    const usersRemoved = users.filter(user => user !== userName);
-    if (usersRemoved.length === 0 || usersRemoved === placeholderSignup) field.value = placeholderSignup;
-    else field.value = usersRemoved.join(', ');
-  });
+const removeUserFromEmbedField = (message, embeddedMessage, fieldName, userName) => {
+  const index = embeddedMessage.fields.findIndex(element => element.name === fieldName);
+  let field = Object.assign({}, embeddedMessage.fields[index]);
+
+  const users = field.value.split(',').map(name => name.trim());
+  const usersRemoved = users.filter(user => user !== userName);
+  if (usersRemoved.length === 0 || usersRemoved === placeholderSignup) field.value = placeholderSignup;
+  else field.value = usersRemoved.join(', ');
+
+  embeddedMessage.fields[index] = field;
 
   embeddedMessage.fields.forEach(field => {
     field.embed = null;
@@ -105,7 +141,20 @@ const removeSignup = (messageReaction, user) => {
   const embeddedMessage = message.embeds[0];
   if (!embeddedMessage || embeddedMessage.type !== 'rich') return;
 
-  removeUserFromEmbedField(message, embeddedMessage, user.username);
+  const emojis = guildEmojis(message);
+  const reactionEmoji = messageReaction.emoji.name;
+
+  switch (reactionEmoji) {
+    case 'tank':
+      removeUserFromEmbedField(message, embeddedMessage, `${tankEmoji(emojis)}`, user.username);
+      break;
+    case 'healer':
+      removeUserFromEmbedField(message, embeddedMessage, `${healerEmoji(emojis)}`, user.username);
+      break;
+    case 'dps':
+      removeUserFromEmbedField(message, embeddedMessage, `${dpsEmoji(emojis)}`, user.username);
+      break;
+  }
 };
 
 module.exports = { createSignup, addSignup, removeSignup };

@@ -1,17 +1,6 @@
-const path = require('path');
+const { signups } = require('../modules');
 
 const help = require('./help');
-const signups = require('./signups');
-
-const migrateLatest = knex => {
-  return knex.migrate.latest({
-    directory: path.resolve(__dirname, '../migrations')
-  });
-};
-
-const isInArray = (array, string) => {
-  return array.indexOf(string.toLowerCase()) > -1;
-};
 
 const handleMessage = async message => {
   // Words with separators, for commands
@@ -29,4 +18,4 @@ const handleMessage = async message => {
   }
 };
 
-module.exports = { migrateLatest, isInArray, handleMessage };
+module.exports = { handleMessage };

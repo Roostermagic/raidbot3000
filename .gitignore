@@ -71,3 +71,6 @@ example.json
 
 # MacOS things
 .DS_Store
+
+.idea
+raidbot3000.iml

@@ -1,10 +1,7 @@
 require('dotenv').config();
-const Discord = require('discord.js');
-
 const knex = require('./knex');
-const utils = require('./modules/utils');
-
-const client = new Discord.Client();
+const { utils } = require('./util');
+const client = require('./client');
 
 const token = process.env.DISCORD_TOKEN;
 
@@ -15,16 +12,6 @@ const start = async () => {
 };
 
 start();
-
-client.on('ready', () => {
-  console.log('I am ready!');
-});
-
-client.on('message', async message => {
-  if (!message.author.bot) {
-    utils.handleMessage(message);
-  }
-});
 
 const login = async () => {
   for (let tries = 0; ; tries++) {
